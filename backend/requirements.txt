@@ -1,4 +1,4 @@
-Django==5.1.1
+Django==5.2.1
 djangorestframework==3.16.0
 pytest==8.3.5
 pytest-django==4.11.1
@@ -8,3 +8,7 @@ webcolors==24.11.1
 Pillow==11.2.1
 PyYAML==6.0.2
 psycopg2-binary==2.9.10
+django-filter==25.1
+
+shortuuid~=1.0.13
+python-dotenv~=1.1.0

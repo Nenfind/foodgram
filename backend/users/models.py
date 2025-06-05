@@ -7,8 +7,14 @@ from core.constants import MAX_LENGTH_EMAIL, MAX_LENGTH_NAME
 
 class User(AbstractUser):
     email = models.EmailField(max_length=MAX_LENGTH_EMAIL, unique=True)
-    first_name = models.CharField(max_length=MAX_LENGTH_NAME)
-    last_name = models.CharField(max_length=MAX_LENGTH_NAME)
+    first_name = models.CharField(
+        max_length=MAX_LENGTH_NAME,
+        blank=False
+    )
+    last_name = models.CharField(
+        max_length=MAX_LENGTH_NAME,
+        blank=False
+    )
     avatar = models.ImageField(
         null=True,
         blank=True,
@@ -16,7 +22,7 @@ class User(AbstractUser):
         upload_to='users/avatars'
     )
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'username', 'password']
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'username']
 
 
 class Subscription(models.Model):

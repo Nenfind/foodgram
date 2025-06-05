@@ -2,7 +2,7 @@ from django.urls import include, path, re_path
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from api.views import RecipeViewSet, TagViewSet, UserViewSet
+from api.views import IngredientViewSet, RecipeViewSet, TagViewSet, UserViewSet
 
 router_v1 = DefaultRouter()
 
@@ -21,10 +21,16 @@ router_v1.register(
     UserViewSet,
     basename='users'
 )
+router_v1.register(
+    r'ingredients',
+    IngredientViewSet,
+    basename='ingredients'
+)
 
 urlpatterns = [
-    # path('auth/token/login/', TokenObtainView.as_view(), name='token_obtain'),
     re_path(r'^auth/', include('djoser.urls.authtoken')),
     path('', include(router_v1.urls)),
-
+    path('s/<str:short_link>/',
+         RecipeViewSet.as_view({'get': 'follow_short_link'}),
+         name='recipe-shortlink'),
 ]

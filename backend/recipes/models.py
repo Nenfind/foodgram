@@ -1,3 +1,4 @@
+import shortuuid
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxLengthValidator, MinValueValidator
 from django.db import models
@@ -8,7 +9,7 @@ from core.constants import (
     MAX_LENGTH_MEASURE,
     MAX_LENGTH_SHORT,
     MAX_LENGTH_STR,
-    MAX_LENGTH_TEXT, MIN_COOKING_TIME
+    MAX_LENGTH_TEXT, MIN_COOKING_TIME, SHORT_LINK_LENGTH
 )
 
 User = get_user_model()
@@ -105,6 +106,13 @@ class Recipe(models.Model):
         validators=[MinValueValidator(MIN_COOKING_TIME)],
         help_text='Введите время приготовления'
     )
+    short_link = models.SlugField(
+        verbose_name='короткая ссылка',
+        max_length=MAX_LENGTH_LONG,
+        unique=True,
+        blank=True,
+        help_text='Короткая неизменяющаяся ссылка',
+    )
 
     class Meta:
         ordering = ('name',)
@@ -113,6 +121,21 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name[:MAX_LENGTH_STR]
+
+    def save(self, *args, **kwargs):
+        if not self.short_link:
+            while True:
+                self.short_link = shortuuid.ShortUUID().random(
+                    length=SHORT_LINK_LENGTH
+                )
+                if not Recipe.objects.filter(short_link=self.short_link).exists():
+                    break
+        super().save(*args, **kwargs)
+
+    def get_short_link(self, request):
+        if request:
+            return request.build_absolute_uri(f'/s/{self.short_link}/')
+        return f'/s/{self.short_link}/'
 
 
 class RecipeIngredient(models.Model):
@@ -137,7 +160,7 @@ class RecipeIngredient(models.Model):
             models.UniqueConstraint(
                 fields=['recipe', 'ingredient'],
                 name='unique_recipe_ingredient'
-            )
+            ),
         ]
 
 

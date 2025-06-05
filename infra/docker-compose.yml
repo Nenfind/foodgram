@@ -3,7 +3,7 @@ services:
     container_name: foodgram-front
     build: ../frontend
     environment:
-      - API_URL=http://host.docker.internal:8000  # Key change here
+      - API_URL=http://host.docker.internal:8000
     volumes:
       - ../frontend/:/app/result_build/
 
@@ -16,5 +16,6 @@ services:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
-    extra_hosts:  # Ensures host.docker.internal resolves
+      - ../backend/media:/media
+    extra_hosts:
       - "host.docker.internal:host-gateway"
