@@ -2,7 +2,10 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 
+from core.constants import EMPTY_VALUE_RU
+
 User = get_user_model()
+
 
 class FoodgramUserAdmin(UserAdmin):
     model = User
@@ -19,7 +22,7 @@ class FoodgramUserAdmin(UserAdmin):
         'is_active',
     )
     search_fields = ('email', 'username')
-    empty_value_display = 'не задано'
+    empty_value_display = EMPTY_VALUE_RU
 
 
 admin.site.register(User, FoodgramUserAdmin)

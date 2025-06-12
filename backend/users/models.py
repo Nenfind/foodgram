@@ -6,6 +6,12 @@ from core.constants import MAX_LENGTH_EMAIL, MAX_LENGTH_NAME
 
 
 class User(AbstractUser):
+    """
+    Custom User model for Foodgram project.
+    All fields except avatar are required,
+    username field is email.
+    """
+
     email = models.EmailField(max_length=MAX_LENGTH_EMAIL, unique=True)
     first_name = models.CharField(
         max_length=MAX_LENGTH_NAME,
@@ -26,6 +32,8 @@ class User(AbstractUser):
 
 
 class Subscription(models.Model):
+    """Model for user-to-user subscriptions."""
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -35,6 +43,7 @@ class Subscription(models.Model):
         on_delete=models.CASCADE,
         related_name='subscriptions',
     )
+
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -44,6 +53,7 @@ class Subscription(models.Model):
         ]
 
     def clean(self):
+        """Prevents self-subscriptions."""
         if self.user == self.subscription:
             raise ValidationError(
                 'Нельзя подписаться на самого себя!'

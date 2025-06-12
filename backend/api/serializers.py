@@ -13,7 +13,10 @@ from users.utils import validate_password_with_exception
 
 User = get_user_model()
 
+
 class Base64ImageField(serializers.ImageField):
+    """Image field for base64 encoded image."""
+
     def to_internal_value(self, data):
         if isinstance(data, str) and data.startswith('data:image'):
             format, imgstr = data.split(';base64,')
@@ -26,11 +29,12 @@ class UserSerializer(serializers.ModelSerializer):
     avatar = serializers.SerializerMethodField()
     is_subscribed = serializers.SerializerMethodField()
     password = serializers.CharField(write_only=True, required=True)
+
     class Meta:
         model = User
         fields = (
-        'email', 'id', 'username', 'first_name',
-        'last_name', 'is_subscribed', 'avatar', 'password'
+            'email', 'id', 'username', 'first_name',
+            'last_name', 'is_subscribed', 'avatar', 'password'
         )
         required_fields = (
             'email', 'first_name',
@@ -55,9 +59,9 @@ class UserSerializer(serializers.ModelSerializer):
         fields = super().to_representation(instance)
         request = self.context.get('request')
         if (
-                request.method == 'POST'
-                and request.path.endswith('/api/users/')
-            ):
+            request.method == 'POST'
+            and request.path.endswith('/api/users/')
+        ):
             fields.pop('is_subscribed', None)
             fields.pop('avatar', None)
         return fields
@@ -110,6 +114,7 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
     measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit'
     )
+
     class Meta:
         model = RecipeIngredient
         fields = ('id', 'name', 'measurement_unit', 'amount')
@@ -190,7 +195,9 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
                     'Должно быть положительное количество ингредиента!'
                 )
             try:
-                existing_ingredient = Ingredient.objects.get(id=ingredient['id'])
+                existing_ingredient = Ingredient.objects.get(
+                    id=ingredient['id']
+                )
                 if existing_ingredient in validated_ingredients:
                     raise serializers.ValidationError(
                         'Рецепт содержит дублирующиеся ингредиенты.'
@@ -276,7 +283,9 @@ class RecipeMinifiedSerializer(serializers.ModelSerializer):
 
 class SubscriptionUserSerializer(UserSerializer):
     recipes = serializers.SerializerMethodField()
-    recipes_count = serializers.IntegerField(source='recipes.count', read_only=True)
+    recipes_count = serializers.IntegerField(
+        source='recipes.count', read_only=True
+    )
 
     class Meta(UserSerializer.Meta):
         fields = UserSerializer.Meta.fields + ('recipes', 'recipes_count')
@@ -290,4 +299,6 @@ class SubscriptionUserSerializer(UserSerializer):
                 recipes = recipes[:limit]
             except (TypeError, ValueError):
                 pass
-        return RecipeMinifiedSerializer(recipes, many=True, context=self.context).data
+        return RecipeMinifiedSerializer(
+            recipes, many=True, context=self.context
+        ).data

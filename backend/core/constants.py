@@ -1,3 +1,4 @@
+"""All the constants used throughout the application"""
 MAX_LENGTH_EMAIL = 256
 MAX_LENGTH_NAME = 150
 MAX_LENGTH_SHORT = 32
@@ -9,3 +10,4 @@ MAX_LENGTH_MEASURE = 64
 MIN_COOKING_TIME = 1
 SHORT_LINK_LENGTH = 8
 DATETIME_FORMAT = '%d/%m/%Y %H:%M'
+EMPTY_VALUE_RU = 'не задано'

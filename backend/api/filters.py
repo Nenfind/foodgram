@@ -6,6 +6,8 @@ from shop.models import ShoppingCart
 
 
 class RecipeFilter(filters.FilterSet):
+    """Search filter for recipes."""
+
     tags = filters.ModelMultipleChoiceFilter(
         field_name='tags__slug',
         to_field_name='slug',

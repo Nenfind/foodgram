@@ -30,10 +30,13 @@ User = get_user_model()
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    """Viewset for all users endpoints."""
+
     queryset = User.objects.prefetch_related('subscriptions')
     serializer_class = UserSerializer
 
     def get_permissions(self):
+        """Allows to create and look up accounts for anonymous users."""
         if self.action in ['list', 'retrieve', 'create']:
             return [permissions.AllowAny()]
         return [permissions.IsAuthenticated()]
@@ -63,7 +66,9 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.is_valid(raise_exception=True)
             request.user.avatar = serializer.validated_data['avatar']
             request.user.save()
-            return Response({'avatar': request.user.avatar.url}, status=status.HTTP_200_OK)
+            return Response(
+                {'avatar': request.user.avatar.url}, status=status.HTTP_200_OK
+            )
         request.user.avatar.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -80,7 +85,6 @@ class UserViewSet(viewsets.ModelViewSet):
         request.user.set_password(serializer.validated_data['new_password'])
         request.user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
 
     @action(
         detail=True,
@@ -107,7 +111,9 @@ class UserViewSet(viewsets.ModelViewSet):
                     {"error": "Вы уже подписаны."},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            Subscription.objects.create(user=request.user, subscription=target_user)
+            Subscription.objects.create(
+                user=request.user, subscription=target_user
+            )
             serializer = SubscriptionUserSerializer(
                 target_user,
                 context={'request': request}
@@ -133,11 +139,15 @@ class UserViewSet(viewsets.ModelViewSet):
             subscriptions__user=request.user
         ).prefetch_related('recipes')
         page = self.paginate_queryset(subscribed_users)
-        serializer = SubscriptionUserSerializer(page, many=True, context={'request': request})
+        serializer = SubscriptionUserSerializer(
+            page, many=True, context={'request': request}
+        )
         return self.get_paginated_response(serializer.data)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
+    """Viewset for all recipes endpoints."""
+
     queryset = Recipe.objects.all()
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
@@ -172,8 +182,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def shopping_cart(self, request, pk=None):
         recipe = get_object_or_404(Recipe, pk=pk)
         if request.method == 'POST':
-            serializer = RecipeMinifiedSerializer(recipe, context={'request': request})
-            if ShoppingCart.objects.filter(recipe=recipe, user=self.request.user).exists():
+            serializer = RecipeMinifiedSerializer(
+                recipe, context={'request': request}
+            )
+            if ShoppingCart.objects.filter(
+                    recipe=recipe, user=self.request.user
+            ).exists():
                 return Response(status=status.HTTP_400_BAD_REQUEST)
             ShoppingCart.objects.create(recipe=recipe, user=self.request.user)
             return Response(
@@ -200,8 +214,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         filename = f"{user.username}'s_shopping_list.txt"
         response = HttpResponse(
             shopping_list, content_type='text/plain; charset=utf-8',
-            headers = {
-                "Content-Disposition": f"attachment; filename*=UTF-8''{filename}",
+            headers={
+                "Content-Disposition": (
+                    f"attachment; filename*=UTF-8''{filename}"
+                ),
                 "Content-Length": len(shopping_list.encode("utf-8"))
             }
         )
@@ -225,7 +241,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 context={'request': request}
             )
             Favorite.objects.create(recipe=recipe, user=self.request.user)
-            return Response(status=status.HTTP_201_CREATED, data=serializer.data)
+            return Response(
+                status=status.HTTP_201_CREATED,
+                data=serializer.data
+            )
         deleted, _ = Favorite.objects.filter(
             user=self.request.user,
             recipe=recipe
@@ -236,12 +255,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet for tags."""
+
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet for ingredients."""
+
     serializer_class = IngredientSerializer
     pagination_class = None
 

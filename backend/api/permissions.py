@@ -1,6 +1,8 @@
 from rest_framework import permissions
 
+
 class IsOwnerOrReadOnly(permissions.BasePermission):
+    """Allows users to edit their own content."""
 
     def has_permission(self, request, view):
         return (

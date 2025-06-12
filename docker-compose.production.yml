@@ -1,0 +1,39 @@
+
+volumes:
+  static:
+  media:
+  postgres_data:
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file: .env
+
+  backend:
+    image: nenfind/foodgram_backend
+    volumes:
+      - static:/backend_static
+      - media:/media
+    depends_on:
+      - db
+    env_file: .env
+  frontend:
+    image: nenfind/foodgram_frontend
+    env_file: .env
+    command: cp -r /app/build/. /static/
+    volumes:
+      - static:/static
+  gateway:
+    image: nenfind/foodgram_gateway
+    env_file: .env
+    ports:
+      - 8000:80
+    volumes:
+      - ./frontend/build:/usr/share/nginx/html/
+      - ./docs/:/usr/share/nginx/html/api/docs/
+      - static_volume:/static
+      - media_volume:/app/backend/media
+    depends_on:
+      - backend
+      - frontend

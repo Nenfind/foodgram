@@ -27,8 +27,9 @@ def create_shopping_list(user) -> str:
     ]
     shopping_list.insert(
         0,
-        (f"Список покупок пользователя:\n\n{user.get_full_name() or user.username}\n"
-        f"{dt.now().strftime(DATETIME_FORMAT)}\n")
+        ("Список покупок пользователя:"
+         f"\n\n{user.get_full_name() or user.username}\n"
+         f"{dt.now().strftime(DATETIME_FORMAT)}\n")
     )
     shopping_list.append("\n\nПриятной готовки!")
     return ('\n'.join(shopping_list))

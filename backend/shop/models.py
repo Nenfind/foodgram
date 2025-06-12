@@ -5,7 +5,10 @@ from recipes.models import Recipe
 
 User = get_user_model()
 
+
 class ShoppingCart(models.Model):
+    """Model for shopping cart."""
+
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,

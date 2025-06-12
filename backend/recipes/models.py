@@ -9,12 +9,20 @@ from core.constants import (
     MAX_LENGTH_MEASURE,
     MAX_LENGTH_SHORT,
     MAX_LENGTH_STR,
-    MAX_LENGTH_TEXT, MIN_COOKING_TIME, SHORT_LINK_LENGTH
+    MAX_LENGTH_TEXT,
+    MIN_COOKING_TIME,
+    SHORT_LINK_LENGTH
 )
 
 User = get_user_model()
 
+
 class Ingredient(models.Model):
+    """
+    Model for ingredients,
+    contains name and measurement unit.
+    """
+
     name = models.CharField(
         verbose_name='название ингредиента',
         max_length=MAX_LENGTH_INGREDIENT,
@@ -38,6 +46,8 @@ class Ingredient(models.Model):
 
 
 class Tag(models.Model):
+    """Model for tags, contains name and slug."""
+
     name = models.CharField(
         verbose_name='имя тега',
         max_length=MAX_LENGTH_SHORT,
@@ -60,6 +70,8 @@ class Tag(models.Model):
 
 
 class Recipe(models.Model):
+    """Model for recipes, all fields are required."""
+
     author = models.ForeignKey(
         User,
         verbose_name='автор рецепта',
@@ -113,9 +125,13 @@ class Recipe(models.Model):
         blank=True,
         help_text='Короткая неизменяющаяся ссылка',
     )
+    pub_date = models.DateTimeField(
+        verbose_name='дата публикации',
+        auto_now_add=True,
+    )
 
     class Meta:
-        ordering = ('name',)
+        ordering = ('pub_date', 'name',)
         verbose_name = 'рецепт'
         verbose_name_plural = 'рецепты'
 
@@ -128,7 +144,9 @@ class Recipe(models.Model):
                 self.short_link = shortuuid.ShortUUID().random(
                     length=SHORT_LINK_LENGTH
                 )
-                if not Recipe.objects.filter(short_link=self.short_link).exists():
+                if not Recipe.objects.filter(
+                        short_link=self.short_link
+                ).exists():
                     break
         super().save(*args, **kwargs)
 
@@ -139,6 +157,8 @@ class Recipe(models.Model):
 
 
 class RecipeIngredient(models.Model):
+    """Model for ingredients in recipes."""
+
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
@@ -165,6 +185,8 @@ class RecipeIngredient(models.Model):
 
 
 class Favorite(models.Model):
+    """Model for recipes in favorite list."""
+
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
