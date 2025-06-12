@@ -6,13 +6,13 @@ volumes:
 services:
   db:
     image: postgres:13.10
-    container_name: db
+    container_name: foodgram-db
     env_file: .env
     volumes:
       - pg_data_production:/var/lib/postgresql/data
   backend:
     image: nenfind/foodgram_backend:latest
-    container_name: backend
+    container_name: foodgram-backend
     env_file: .env
     depends_on:
       - db
@@ -21,7 +21,7 @@ services:
       - media_volume:/app/backend/media
   frontend:
     image: nenfind/foodgram_frontend:latest
-    container_name: frontend
+    container_name: foodgram-frontend
     command: cp -r /app/build/. /static/
     volumes:
       - static_volume:/static

@@ -10,7 +10,7 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
   backend:
-    container_name: foodgram-back
+    container_name: foodgram-backend
     build: ./backend/
     env_file: .env
     depends_on:
@@ -19,7 +19,7 @@ services:
       - static:/backend_static
       - media:/app/backend/media
   frontend:
-    container_name: foodgram-front
+    container_name: foodgram-frontend
     env_file: .env
     build: frontend
     volumes:
