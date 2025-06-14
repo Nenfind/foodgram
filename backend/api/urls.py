@@ -29,7 +29,4 @@ router_v1.register(
 urlpatterns = [
     re_path(r'^auth/', include('djoser.urls.authtoken')),
     path('', include(router_v1.urls)),
-    path('s/<str:short_link>/',
-         RecipeViewSet.as_view({'get': 'follow_short_link'}),
-         name='recipe-shortlink'),
 ]

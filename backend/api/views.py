@@ -168,11 +168,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(
         detail=False,
         methods=['get'],
-        url_path=r's/(?P<short_link>[a-km-zA-HJ-NP-Z2-9]+)'
+        url_path=r's/(?P<short_link>[a-km-zA-HJ-NP-Z2-9]+)',
+        url_name='recipe-shortlink',
     )
     def follow_short_link(self, request, short_link=None):
         recipe = get_object_or_404(Recipe, short_link=short_link)
-        return redirect('recipe-detail', pk=recipe.id)
+        return Response(RecipeSerializer(recipe).data)
 
     @action(
         detail=True,
