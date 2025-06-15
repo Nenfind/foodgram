@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 
-from core.constants import EMPTY_VALUE_RU
+from recipes.constants import EMPTY_VALUE_RU
 
 User = get_user_model()
 

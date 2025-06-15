@@ -5,9 +5,8 @@ from django.core.files.base import ContentFile
 from rest_framework import serializers
 
 from api.utils import get_user_from_context, is_recipe_in_relation
-from core.constants import MIN_COOKING_TIME
-from recipes.models import Favorite, Ingredient, Recipe, RecipeIngredient, Tag
-from shop.models import ShoppingCart
+from recipes.constants import MIN_COOKING_TIME
+from recipes.models import Favorite, Ingredient, Recipe, RecipeIngredient, ShoppingCart, Tag
 from users.models import Subscription
 from users.utils import validate_password_with_exception
 

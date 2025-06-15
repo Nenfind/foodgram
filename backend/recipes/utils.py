@@ -2,7 +2,7 @@ from datetime import datetime as dt
 
 from django.db.models import Sum
 
-from core.constants import DATETIME_FORMAT
+from recipes.constants import DATETIME_FORMAT
 from recipes.models import Ingredient
 
 

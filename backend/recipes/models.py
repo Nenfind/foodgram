@@ -3,16 +3,8 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxLengthValidator, MinValueValidator
 from django.db import models
 
-from core.constants import (
-    MAX_LENGTH_INGREDIENT,
-    MAX_LENGTH_LONG,
-    MAX_LENGTH_MEASURE,
-    MAX_LENGTH_SHORT,
-    MAX_LENGTH_STR,
-    MAX_LENGTH_TEXT,
-    MIN_COOKING_TIME,
-    SHORT_LINK_LENGTH
-)
+from recipes.constants import MAX_LENGTH_INGREDIENT, MAX_LENGTH_LONG, MAX_LENGTH_MEASURE, MAX_LENGTH_SHORT, \
+    MAX_LENGTH_STR, MAX_LENGTH_TEXT, MIN_COOKING_TIME, SHORT_LINK_LENGTH
 
 User = get_user_model()
 
@@ -184,26 +176,43 @@ class RecipeIngredient(models.Model):
         ]
 
 
-class Favorite(models.Model):
-    """Model for recipes in favorite list."""
+class ShopFavorite(models.Model):
+    """Abstract model for both shopping cart and favorites."""
 
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='favorites',
-        verbose_name='рецепт'
+        verbose_name='рецепты',
+        related_name='%(app_label)s_%(model_name)s_related'
     )
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='favorites',
-        verbose_name='пользователь'
+        verbose_name='пользователь',
+        related_name='%(app_label)s_%(model_name)s_related'
     )
 
     class Meta:
+        abstract = True
         constraints = [
             models.UniqueConstraint(
                 fields=('recipe', 'user'),
-                name='unique_favorite_recipe'
+                name='unique_%(app_label)s_%(class)s'
             )
         ]
+
+
+class Favorite(ShopFavorite):
+    """Model for favorites."""
+
+
+class ShoppingCart(ShopFavorite):
+    """Model for shopping cart."""
+
+    class Meta:
+        verbose_name = 'корзина покупок'
+        verbose_name_plural = 'корзины покупок'
+        default_related_name = 'shopping_cart'
+
+    def __str__(self):
+        return f'Корзина пользователя {self.user.username}'

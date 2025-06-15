@@ -1,8 +1,7 @@
 from django_filters import rest_framework as filters
 
 from api.utils import filter_by_relation, get_user_from_context
-from recipes.models import Favorite, Recipe, Tag
-from shop.models import ShoppingCart
+from recipes.models import Favorite, Recipe, ShoppingCart, Tag
 
 
 class RecipeFilter(filters.FilterSet):

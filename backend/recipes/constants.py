@@ -1,6 +1,3 @@
-"""All the constants used throughout the application"""
-MAX_LENGTH_EMAIL = 256
-MAX_LENGTH_NAME = 150
 MAX_LENGTH_SHORT = 32
 MAX_LENGTH_LONG = 256
 MAX_LENGTH_TEXT = 8000

@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from recipes.models import Ingredient, Recipe, Tag
+from recipes.constants import EMPTY_VALUE_RU
+from recipes.models import Ingredient, Recipe, ShoppingCart, Tag
 
 
 class RecipeAdmin(admin.ModelAdmin):
@@ -18,6 +19,7 @@ class RecipeAdmin(admin.ModelAdmin):
     search_fields = (
         'author', 'name',
     )
+    empty_value_display = EMPTY_VALUE_RU
 
     def get_favorites_count(self, obj):
         return obj.favorites.count()
@@ -30,6 +32,7 @@ class IngredientAdmin(admin.ModelAdmin):
     list_editable = ('measurement_unit',)
     search_fields = ('name',)
     list_filter = ('name', 'measurement_unit')
+    empty_value_display = EMPTY_VALUE_RU
 
 
 class TagAdmin(admin.ModelAdmin):
@@ -37,8 +40,17 @@ class TagAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug')
     list_editable = ('slug',)
     search_fields = ('name',)
+    empty_value_display = EMPTY_VALUE_RU
+
+
+class ShoppingCartAdmin(admin.ModelAdmin):
+    model = ShoppingCart
+    list_display = ('recipe', 'user')
+    search_fields = ('recipe', 'user',)
+    empty_value_display = EMPTY_VALUE_RU
 
 
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Tag, TagAdmin)
+admin.site.register(ShoppingCart, ShoppingCartAdmin)

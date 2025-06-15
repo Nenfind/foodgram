@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from core.constants import MAX_LENGTH_EMAIL, MAX_LENGTH_NAME
+from users.constants import MAX_LENGTH_EMAIL, MAX_LENGTH_NAME
 
 
 class User(AbstractUser):

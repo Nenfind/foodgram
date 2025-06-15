@@ -21,9 +21,8 @@ from api.serializers import (
     TagSerializer,
     UserSerializer
 )
-from recipes.models import Favorite, Ingredient, Recipe, Tag
-from shop.models import ShoppingCart
-from shop.utils import create_shopping_list
+from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
+from recipes.utils import create_shopping_list
 from users.models import Subscription
 
 User = get_user_model()
@@ -152,6 +151,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     permission_classes = (IsOwnerOrReadOnly, )
+
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
