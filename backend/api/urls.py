@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import include, path, re_path
 from django.views.generic import TemplateView
 from rest_framework.routers import DefaultRouter
@@ -29,10 +30,15 @@ router_v1.register(
 
 urlpatterns = [
     re_path(r'^auth/', include('djoser.urls.authtoken')),
-    path(
-        'docks/',
-        TemplateView.as_view(template_name='redoc.html'),
-        name='redoc'
-    ),
+
     path('', include(router_v1.urls)),
 ]
+
+if settings.DEBUG:
+    urlpatterns += [
+        path(
+            'redoc/',
+            TemplateView.as_view(template_name='redoc.html'),
+            name='redoc'
+        ),
+    ]
