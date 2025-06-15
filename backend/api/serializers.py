@@ -6,7 +6,14 @@ from rest_framework import serializers
 
 from api.utils import get_user_from_context, is_recipe_in_relation
 from recipes.constants import MIN_COOKING_TIME
-from recipes.models import Favorite, Ingredient, Recipe, RecipeIngredient, ShoppingCart, Tag
+from recipes.models import (
+    Favorite,
+    Ingredient,
+    Recipe,
+    RecipeIngredient,
+    ShoppingCart,
+    Tag
+)
 from users.models import Subscription
 from users.utils import validate_password_with_exception
 

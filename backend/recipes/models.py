@@ -3,8 +3,16 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxLengthValidator, MinValueValidator
 from django.db import models
 
-from recipes.constants import MAX_LENGTH_INGREDIENT, MAX_LENGTH_LONG, MAX_LENGTH_MEASURE, MAX_LENGTH_SHORT, \
-    MAX_LENGTH_STR, MAX_LENGTH_TEXT, MIN_COOKING_TIME, SHORT_LINK_LENGTH
+from recipes.constants import (
+    MAX_LENGTH_INGREDIENT,
+    MAX_LENGTH_LONG,
+    MAX_LENGTH_MEASURE,
+    MAX_LENGTH_SHORT,
+    MAX_LENGTH_STR,
+    MAX_LENGTH_TEXT,
+    MIN_COOKING_TIME,
+    SHORT_LINK_LENGTH
+)
 
 User = get_user_model()
 
