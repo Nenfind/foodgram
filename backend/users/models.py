@@ -1,5 +1,4 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
 from django.db import models
 
 from users.constants import MAX_LENGTH_EMAIL, MAX_LENGTH_NAME
@@ -49,12 +48,9 @@ class Subscription(models.Model):
             models.UniqueConstraint(
                 fields=['user', 'subscription'],
                 name='unique_subscription'
-            )
+            ),
+            models.CheckConstraint(
+                check=~models.Q(user=models.F("subscription")),
+                name="prevent_self_subscription",
+            ),
         ]
-
-    def clean(self):
-        """Prevents self-subscriptions."""
-        if self.user == self.subscription:
-            raise ValidationError(
-                'Нельзя подписаться на самого себя!'
-            )

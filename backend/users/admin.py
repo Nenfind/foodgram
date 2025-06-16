@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import Group
 
 from recipes.constants import EMPTY_VALUE_RU
 
@@ -26,3 +27,4 @@ class FoodgramUserAdmin(UserAdmin):
 
 
 admin.site.register(User, FoodgramUserAdmin)
+admin.site.unregister(Group)
