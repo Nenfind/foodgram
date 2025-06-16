@@ -9,6 +9,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 
 from api.filters import RecipeFilter
+from api.paginators import PageLimitPagination
 from api.permissions import IsOwnerOrReadOnly
 from api.serializers import (
     AvatarForUserSerializer,
@@ -33,6 +34,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     queryset = User.objects.prefetch_related('subscriptions')
     serializer_class = UserSerializer
+    pagination_class = PageLimitPagination
 
     def get_permissions(self):
         """Allows to create and look up accounts for anonymous users."""
@@ -151,6 +153,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     permission_classes = (IsOwnerOrReadOnly, )
+    pagination_class = PageLimitPagination
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
@@ -259,14 +262,12 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    pagination_class = None
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet for ingredients."""
 
     serializer_class = IngredientSerializer
-    pagination_class = None
 
     def get_queryset(self):
         search = self.request.query_params.get('name', '')
