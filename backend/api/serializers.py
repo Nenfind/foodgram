@@ -1,9 +1,7 @@
-import base64
-
 from django.contrib.auth import get_user_model
-from django.core.files.base import ContentFile
 from rest_framework import serializers
 
+from api.fields import Base64ImageField
 from api.utils import get_user_from_context, is_recipe_in_relation
 from recipes.constants import MIN_COOKING_TIME
 from recipes.models import (
@@ -20,31 +18,19 @@ from users.utils import validate_password_with_exception
 User = get_user_model()
 
 
-class Base64ImageField(serializers.ImageField):
-    """Image field for base64 encoded image."""
-
-    def to_internal_value(self, data):
-        if isinstance(data, str) and data.startswith('data:image'):
-            format, imgstr = data.split(';base64,')
-            ext = format.split('/')[-1]
-            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
-        return super().to_internal_value(data)
-
-
 class UserSerializer(serializers.ModelSerializer):
     avatar = serializers.SerializerMethodField()
     is_subscribed = serializers.SerializerMethodField()
-    password = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = User
         fields = (
             'email', 'id', 'username', 'first_name',
-            'last_name', 'is_subscribed', 'avatar', 'password'
+            'last_name', 'is_subscribed', 'avatar',
         )
         required_fields = (
             'email', 'first_name',
-            'last_name', 'password',
+            'last_name',
         )
 
     def get_avatar(self, obj):
@@ -60,46 +46,6 @@ class UserSerializer(serializers.ModelSerializer):
                 subscription=obj,
             ).exists()
         return False
-
-    def to_representation(self, instance):
-        fields = super().to_representation(instance)
-        request = self.context.get('request')
-        if (
-            request.method == 'POST'
-            and request.path.endswith('/api/users/')
-        ):
-            fields.pop('is_subscribed', None)
-            fields.pop('avatar', None)
-        return fields
-
-    def create(self, validated_data):
-        password = validated_data.pop('password', None)
-        user = User.objects.create(**validated_data)
-        validate_password_with_exception(password, 'password')
-        user.set_password(password)
-        user.save()
-        return user
-
-
-class PasswordChangeSerializer(serializers.Serializer):
-    new_password = serializers.CharField(write_only=True, required=True)
-    current_password = serializers.CharField(write_only=True, required=True)
-
-    def validate(self, attrs):
-        user = self.context['request'].user
-        if not user.check_password(attrs['current_password']):
-            raise serializers.ValidationError(
-                {'current_password': 'Введён неправильный пароль!'}
-            )
-        validate_password_with_exception(
-            attrs['new_password'],
-            'new_password'
-        )
-        return attrs
-
-
-class AvatarForUserSerializer(serializers.Serializer):
-    avatar = Base64ImageField(required=True)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -162,6 +108,25 @@ class RecipeSerializer(serializers.ModelSerializer):
     def get_is_in_shopping_cart(self, obj):
         user = get_user_from_context(self.context)
         return is_recipe_in_relation(obj, user, ShoppingCart)
+
+
+class AvatarForUserSerializer(serializers.ModelSerializer):
+    avatar = Base64ImageField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('avatar',)
+
+    def validate_avatar(self, value):
+        if value is None or len(value) == 0 or value == '':
+            raise serializers.ValidationError(
+                'Аватар не может быть пустым.'
+            )
+
+    def update(self, instance, validated_data):
+        instance.avatar = validated_data['avatar']
+        instance.save()
+        return instance
 
 
 class RecipeCreateUpdateSerializer(serializers.ModelSerializer):

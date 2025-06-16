@@ -1,3 +1,4 @@
+from djoser.views import UserViewSet as DjoserUserViewSet
 from django.contrib.auth import get_user_model
 from django.db.models import Case, IntegerField, Q, Value, When
 from django.http import HttpResponse
@@ -14,7 +15,6 @@ from api.permissions import IsOwnerOrReadOnly
 from api.serializers import (
     AvatarForUserSerializer,
     IngredientSerializer,
-    PasswordChangeSerializer,
     RecipeCreateUpdateSerializer,
     RecipeMinifiedSerializer,
     RecipeSerializer,
@@ -29,7 +29,7 @@ from users.models import Subscription
 User = get_user_model()
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(DjoserUserViewSet):
     """Viewset for all users endpoints."""
 
     queryset = User.objects.prefetch_related('subscriptions')
@@ -61,29 +61,16 @@ class UserViewSet(viewsets.ModelViewSet):
     def avatar(self, request):
         if request.method == 'PUT':
             serializer = AvatarForUserSerializer(
+                instance=request.user,
                 data=request.data,
                 context={'request': request}
             )
             serializer.is_valid(raise_exception=True)
-            request.user.avatar = serializer.validated_data['avatar']
-            request.user.save()
+            user = serializer.save()
             return Response(
-                {'avatar': request.user.avatar.url}, status=status.HTTP_200_OK
+                {'avatar': user.avatar.url}, status=status.HTTP_200_OK
             )
         request.user.avatar.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    @action(
-        detail=False,
-        methods=('post',)
-    )
-    def set_password(self, request):
-        serializer = PasswordChangeSerializer(
-            data=request.data,
-            context={'request': request}
-        )
-        serializer.is_valid(raise_exception=True)
-        request.user.set_password(serializer.validated_data['new_password'])
         request.user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
