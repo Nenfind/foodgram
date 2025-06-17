@@ -13,7 +13,6 @@ from recipes.models import (
     Tag
 )
 from users.models import Subscription
-from users.utils import validate_password_with_exception
 
 User = get_user_model()
 

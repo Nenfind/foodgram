@@ -2,7 +2,13 @@ from django.contrib import admin
 from django.db.models import Count
 
 from recipes.constants import EMPTY_VALUE_RU
-from recipes.models import Ingredient, Recipe, RecipeIngredient, ShoppingCart, Tag
+from recipes.models import (
+    Ingredient,
+    Recipe,
+    RecipeIngredient,
+    ShoppingCart,
+    Tag
+)
 
 
 class RecipeIngredientInline(admin.TabularInline):
@@ -40,7 +46,6 @@ class RecipeAdmin(admin.ModelAdmin):
     @admin.display(description='В избранном')
     def favorites_count(self, obj):
         return obj.favorites_count
-
 
 
 class IngredientAdmin(admin.ModelAdmin):
