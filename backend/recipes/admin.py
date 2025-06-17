@@ -1,17 +1,27 @@
 from django.contrib import admin
+from django.db.models import Count
 
 from recipes.constants import EMPTY_VALUE_RU
-from recipes.models import Ingredient, Recipe, ShoppingCart, Tag
+from recipes.models import Ingredient, Recipe, RecipeIngredient, ShoppingCart, Tag
+
+
+class RecipeIngredientInline(admin.TabularInline):
+    model = RecipeIngredient
+    fields = ('ingredient', 'amount',)
+    min_num = 1
+    extra = 1
+    validate_min = True
+    autocomplete_fields = ['ingredient']
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    model = Recipe
+    inlines = [RecipeIngredientInline]
     list_display = (
         'author', 'name', 'image',
-        'text', 'cooking_time', 'get_favorites_count'
+        'text', 'cooking_time', 'favorites_count',
     )
     list_filter = (
-        'tags',
+        'tags', 'author__username'
     )
     list_editable = (
         'cooking_time', 'name',
@@ -20,14 +30,20 @@ class RecipeAdmin(admin.ModelAdmin):
         'author', 'name',
     )
     empty_value_display = EMPTY_VALUE_RU
+    min_num = 1
 
-    def get_favorites_count(self, obj):
-        return obj.favorites.count()
-    get_favorites_count.short_description = 'В избранном'
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(
+            favorites_count=Count('favorites'),
+        )
+
+    @admin.display(description='В избранном')
+    def favorites_count(self, obj):
+        return obj.favorites_count
+
 
 
 class IngredientAdmin(admin.ModelAdmin):
-    model = Ingredient
     list_display = ('name', 'measurement_unit')
     list_editable = ('measurement_unit',)
     search_fields = ('name',)
@@ -36,7 +52,6 @@ class IngredientAdmin(admin.ModelAdmin):
 
 
 class TagAdmin(admin.ModelAdmin):
-    model = Tag
     list_display = ('name', 'slug')
     list_editable = ('slug',)
     search_fields = ('name',)
@@ -44,7 +59,6 @@ class TagAdmin(admin.ModelAdmin):
 
 
 class ShoppingCartAdmin(admin.ModelAdmin):
-    model = ShoppingCart
     list_display = ('recipe', 'user')
     search_fields = ('recipe', 'user',)
     empty_value_display = EMPTY_VALUE_RU
