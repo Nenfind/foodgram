@@ -29,7 +29,11 @@ class RecipeFilter(filters.FilterSet):
         )
 
     def filter_favorited(self, queryset, name, value):
-        return self.filter_by_relation(queryset, self.request.user, Favorite, value)
+        return self.filter_by_relation(
+            queryset, self.request.user, Favorite, value
+        )
 
     def filter_shopping_cart(self, queryset, name, value):
-        return self.filter_by_relation(queryset, self.request.user, ShoppingCart, value)
+        return self.filter_by_relation(
+            queryset, self.request.user, ShoppingCart, value
+        )

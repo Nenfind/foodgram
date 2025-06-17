@@ -3,13 +3,8 @@ from django.db import transaction
 from rest_framework import serializers
 
 from api.fields import Base64ImageField
-from recipes.constants import MIN_COOKING_TIME
-from recipes.models import (
-    Ingredient,
-    Recipe,
-    RecipeIngredient,
-    Tag
-)
+from recipes.constants import MAX_POSITIVE_SMALL_INT
+from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
 from users.models import Subscription
 
 User = get_user_model()
@@ -79,6 +74,7 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
                 'Количество ингредиента должно быть положительным!'
             )
         return value
+
 
 class RecipeSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
@@ -152,6 +148,16 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
                 'Рецепт содержит дублирующиеся ингредиенты.'
             )
         return ingredients
+
+    def validate_cooking_time(self, value):
+        if value <= 0:
+            raise serializers.ValidationError(
+                'Время приготовления должно быть положительным!'
+            )
+        if value >= MAX_POSITIVE_SMALL_INT:
+            raise serializers.ValidationError(
+                'Слишком большое время приготовления.'
+            )
 
     def validate(self, data):
         if not data.get('ingredients'):
