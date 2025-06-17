@@ -1,6 +1,10 @@
 import shortuuid
 from django.contrib.auth import get_user_model
-from django.core.validators import MaxLengthValidator, MinValueValidator
+from django.core.validators import (
+    MaxLengthValidator,
+    MaxValueValidator,
+    MinValueValidator
+)
 from django.db import models
 
 from recipes.constants import (
@@ -10,6 +14,8 @@ from recipes.constants import (
     MAX_LENGTH_SHORT,
     MAX_LENGTH_STR,
     MAX_LENGTH_TEXT,
+    MAX_POSITIVE_SMALL_INT,
+    MIN_AMOUNT_OF_INGREDIENTS,
     MIN_COOKING_TIME,
     SHORT_LINK_LENGTH
 )
@@ -26,13 +32,11 @@ class Ingredient(models.Model):
     name = models.CharField(
         verbose_name='название ингредиента',
         max_length=MAX_LENGTH_INGREDIENT,
-        blank=False,
         help_text='Введите название ингредиента'
     )
     measurement_unit = models.CharField(
         verbose_name='единица измерения',
         max_length=MAX_LENGTH_MEASURE,
-        blank=False,
         help_text='Укажите единицу измерения'
     )
 
@@ -40,6 +44,12 @@ class Ingredient(models.Model):
         ordering = ('name',)
         verbose_name = 'ингредиент'
         verbose_name_plural = 'ингредиенты'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'measurement_unit'],
+                name='unique_ingredient_measurement_unit'
+            )
+        ]
 
     def __str__(self):
         return self.name[:MAX_LENGTH_STR]
@@ -77,45 +87,40 @@ class Recipe(models.Model):
         verbose_name='автор рецепта',
         on_delete=models.CASCADE,
         related_name='recipes',
-        blank=False
     )
     name = models.CharField(
         verbose_name='название рецепта',
         max_length=MAX_LENGTH_LONG,
-        blank=False,
         help_text='Введите название рецепта'
     )
     image = models.ImageField(
         verbose_name='изображение блюда',
-        blank=False,
         upload_to='recipe_images',
     )
     text = models.TextField(
         verbose_name='описание рецепта',
         validators=[MaxLengthValidator(MAX_LENGTH_TEXT)],
-        blank=False,
-        null=False,
         help_text='Опишите ваш рецепт'
     )
     tags = models.ManyToManyField(
         Tag,
         verbose_name='теги',
         related_name='recipes',
-        blank=False,
         help_text='Добавьте теги'
     )
     ingredients = models.ManyToManyField(
         Ingredient,
         verbose_name='ингредиент',
-        blank=False,
         related_name='recipes',
         through='RecipeIngredient',
         help_text='Добавьте необходимые ингредиенты'
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='время приготовления',
-        blank=False,
-        validators=[MinValueValidator(MIN_COOKING_TIME)],
+        validators=[
+            MinValueValidator(MIN_COOKING_TIME),
+            MaxValueValidator(MAX_POSITIVE_SMALL_INT)
+        ],
         help_text='Введите время приготовления'
     )
     short_link = models.SlugField(
@@ -170,9 +175,12 @@ class RecipeIngredient(models.Model):
     )
     amount = models.PositiveSmallIntegerField(
         verbose_name='количество ингредиента',
-        blank=False,
         null=False,
-        help_text='Введите нужное количество'
+        help_text='Введите нужное количество',
+        validators=[
+            MinValueValidator(MIN_AMOUNT_OF_INGREDIENTS),
+            MaxValueValidator(MAX_POSITIVE_SMALL_INT)
+        ],
     )
 
     class Meta:
