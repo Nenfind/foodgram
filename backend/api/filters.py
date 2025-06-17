@@ -1,6 +1,5 @@
 from django_filters import rest_framework as filters
 
-from api.utils import filter_by_relation, get_user_from_context
 from recipes.models import Favorite, Recipe, ShoppingCart, Tag
 
 
@@ -21,10 +20,16 @@ class RecipeFilter(filters.FilterSet):
         model = Recipe
         fields = ['author', 'tags']
 
+    def filter_by_relation(queryset, user, relation_model, value):
+        """Filter recipes by relation"""
+        if not value or user.is_anonymous:
+            return queryset
+        return queryset.filter(
+            id__in=relation_model.objects.filter(user=user).values('recipe_id')
+        )
+
     def filter_favorited(self, queryset, name, value):
-        user = get_user_from_context(self.request)
-        return filter_by_relation(queryset, user, Favorite, value)
+        return self.filter_by_relation(queryset, self.request.user, Favorite, value)
 
     def filter_shopping_cart(self, queryset, name, value):
-        user = get_user_from_context(self.request)
-        return filter_by_relation(queryset, user, ShoppingCart, value)
+        return self.filter_by_relation(queryset, self.request.user, ShoppingCart, value)

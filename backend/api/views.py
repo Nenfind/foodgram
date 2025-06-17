@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.db.models import Case, IntegerField, Q, Value, When
+from django.db.models import Case, Exists, IntegerField, OuterRef, Q, Value, When
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -136,7 +136,6 @@ class UserViewSet(DjoserUserViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     """Viewset for all recipes endpoints."""
 
-    queryset = Recipe.objects.all()
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     permission_classes = (IsOwnerOrReadOnly, )
@@ -146,6 +145,25 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if self.action in ['create', 'update', 'partial_update']:
             return RecipeCreateUpdateSerializer
         return RecipeSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Recipe.objects.annotate(
+            is_favorited=Exists(
+                Favorite.objects.filter(
+                    user=user,
+                    recipe=OuterRef('pk')
+                )
+            ),
+            is_in_shopping_cart=Exists(
+                ShoppingCart.objects.filter(
+                    user=user,
+                    recipe=OuterRef('pk')
+                )
+            )
+        ).select_related(
+            'author'
+        ).prefetch_related('tags', 'ingredients')
 
     @action(detail=True, methods=['get'], url_path='get-link')
     def get_link(self, request, pk=None):
