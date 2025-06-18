@@ -13,4 +13,4 @@ class Command(BaseCommand):
         Model = apps.get_model(options['model'])
         with open(options['file'], encoding='utf-8') as f:
             for item in json.load(f):
-                Model.objects.get_or_create(**item)
+                Model.objects.bulk_create(**item, ignore_conflicts=True)
