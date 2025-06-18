@@ -148,7 +148,7 @@ class Recipe(models.Model):
             while True:
                 self.short_link = shortuuid.ShortUUID().random(
                     length=SHORT_LINK_LENGTH
-                )
+                ).lower()
                 if not Recipe.objects.filter(
                         short_link=self.short_link
                 ).exists():

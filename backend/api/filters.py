@@ -1,6 +1,7 @@
+from django.db.models import Case, IntegerField, Q, Value, When
 from django_filters import rest_framework as filters
 
-from recipes.models import Favorite, Recipe, ShoppingCart, Tag
+from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 
 
 class RecipeFilter(filters.FilterSet):
@@ -37,3 +38,28 @@ class RecipeFilter(filters.FilterSet):
         return self.filter_by_relation(
             queryset, self.request.user, ShoppingCart, value
         )
+
+
+class IngredientFilter(filters.FilterSet):
+    """
+    Filter for aligning ingredients in order:
+    first that start with searched phrase, then
+    that contain it and then alphabetically.
+    """
+
+    name = filters.CharFilter(method='filter_name')
+
+    class Meta:
+        model = Ingredient
+        fields = ['name']
+
+    def filter_name(self, queryset, name, value):
+        return queryset.filter(
+            Q(name__istartswith=value) | Q(name__icontains=value)
+        ).annotate(
+            search_priority=Case(
+                When(name__istartswith=value, then=Value(1)),
+                default=Value(2),
+                output_field=IntegerField(),
+            )
+        ).order_by('search_priority', 'name')
