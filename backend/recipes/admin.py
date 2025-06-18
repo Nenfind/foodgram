@@ -30,7 +30,7 @@ class RecipeAdmin(admin.ModelAdmin):
         'tags', 'author__username'
     )
     list_editable = (
-        'cooking_time', 'name',
+        'cooking_time',
     )
     search_fields = (
         'author', 'name',
