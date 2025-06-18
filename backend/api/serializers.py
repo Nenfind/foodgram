@@ -142,7 +142,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         )
 
     def validate_ingredients(self, ingredients):
-        ingredient_ids = [ingredient['id'] for ingredient in ingredients]
+        ingredient_ids = [ingredient['pk'] for ingredient in ingredients]
         if len(ingredient_ids) != len(set(ingredient_ids)):
             raise serializers.ValidationError(
                 'Рецепт содержит дублирующиеся ингредиенты.'
