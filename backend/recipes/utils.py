@@ -13,7 +13,7 @@ def create_shopping_list(user) -> str:
     """
     ingredients = (
         Ingredient.objects.filter(
-            recipeingredient__recipe__in_shopping_cart__user=user
+            recipeingredient__recipe__recipes_shoppingcart_related__user=user
         )
         .annotate(
             total_amount=Sum('recipeingredient__amount'),

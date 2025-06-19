@@ -245,7 +245,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         user = self.request.user
         shopping_list = create_shopping_list(user)
         filename = f"{user.username}'s_shopping_list.txt"
-        response = HttpResponse(
+        return HttpResponse(
             shopping_list, content_type='text/plain; charset=utf-8',
             headers={
                 "Content-Disposition": (
@@ -254,7 +254,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 "Content-Length": len(shopping_list.encode("utf-8"))
             }
         )
-        return response
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
