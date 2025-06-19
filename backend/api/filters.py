@@ -21,7 +21,7 @@ class RecipeFilter(filters.FilterSet):
         model = Recipe
         fields = ['author', 'tags']
 
-    def filter_by_relation(queryset, user, relation_model, value):
+    def filter_by_relation(self, queryset, user, relation_model, value):
         """Filter recipes by relation"""
         if not value or user.is_anonymous:
             return queryset
