@@ -76,7 +76,7 @@ class UserViewSet(DjoserUserViewSet):
 
     def get_user_for_subscription(self, pk):
         try:
-            target_user = get_object_or_404(User, pk=pk)
+            target_user = get_object_or_404(User, pk=id)
         except NotFound:
             return Response(
                 {"detail": "Такого пользователя не существует."},
@@ -88,8 +88,8 @@ class UserViewSet(DjoserUserViewSet):
         detail=True,
         methods=['post'],
     )
-    def subscribe(self, request, pk=None):
-        target_user = self.get_user_for_subscription(pk)
+    def subscribe(self, request, id=None):
+        target_user = self.get_user_for_subscription(id)
         if request.user == target_user:
             return Response(
                 {"error": "Нельзя подписаться на самого себя."},
@@ -112,8 +112,8 @@ class UserViewSet(DjoserUserViewSet):
         )
 
     @subscribe.mapping.delete
-    def unsubscribe(self, pk=None):
-        target_user = self.get_user_for_subscription(pk)
+    def unsubscribe(self, id=None):
+        target_user = self.get_user_for_subscription(id)
         deleted, _ = Subscription.objects.filter(
             user=self.request.user,
             subscription=target_user
