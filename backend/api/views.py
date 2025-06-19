@@ -74,7 +74,7 @@ class UserViewSet(DjoserUserViewSet):
         request.user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def get_user_for_subscription(self, pk):
+    def get_user_for_subscription(self, id):
         try:
             target_user = get_object_or_404(User, pk=id)
         except NotFound:
@@ -87,7 +87,6 @@ class UserViewSet(DjoserUserViewSet):
     @action(
         detail=True,
         methods=['post'],
-        lookup_url_kwarg='id'
     )
     def subscribe(self, request, id=None):
         target_user = self.get_user_for_subscription(id)
