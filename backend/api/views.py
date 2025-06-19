@@ -112,10 +112,10 @@ class UserViewSet(DjoserUserViewSet):
         )
 
     @subscribe.mapping.delete
-    def unsubscribe(self, id=None):
+    def unsubscribe(self, request, id=None):
         target_user = self.get_user_for_subscription(id)
         deleted, _ = Subscription.objects.filter(
-            user=self.request.user,
+            user=request.user,
             subscription=target_user
         ).delete()
         if not deleted:
@@ -215,7 +215,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
 
     @favorite.mapping.delete
-    def favorite_delete(self, pk=None):
+    def favorite_delete(self, request, pk=None):
         return self.favorite_shopping_cart_delete(
             Favorite, pk
         )
@@ -231,7 +231,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
 
     @shopping_cart.mapping.delete
-    def shopping_cart_delete(self, pk=None):
+    def shopping_cart_delete(self, request, pk=None):
         return self.favorite_shopping_cart_delete(
             ShoppingCart, pk
         )
