@@ -228,7 +228,7 @@ class ShoppingCart(ShopFavorite):
     class Meta(ShopFavorite.Meta):
         verbose_name = 'корзина покупок'
         verbose_name_plural = 'корзины покупок'
-        default_related_name = 'shopping_cart'
+        related_name = 'shopping_cart'
 
     def __str__(self):
         return f'Корзина пользователя {self.user.username}'
