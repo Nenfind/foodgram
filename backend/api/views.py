@@ -87,6 +87,7 @@ class UserViewSet(DjoserUserViewSet):
     @action(
         detail=True,
         methods=['post'],
+        lookup_url_kwarg='id'
     )
     def subscribe(self, request, id=None):
         target_user = self.get_user_for_subscription(id)
