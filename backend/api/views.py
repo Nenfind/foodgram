@@ -22,7 +22,7 @@ from api.serializers import (
     TagSerializer,
     UserSerializer
 )
-from recipes.models import Favorite, Recipe, ShoppingCart, Tag
+from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from recipes.utils import create_shopping_list
 from users.models import Subscription
 
@@ -155,6 +155,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        if not user.is_authenticated:
+            return Recipe.objects.all()
         return Recipe.objects.annotate(
             is_favorited=Exists(
                 Favorite.objects.filter(
@@ -270,3 +272,4 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = IngredientFilter
+    queryset = Ingredient.objects.all()

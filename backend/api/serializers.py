@@ -134,7 +134,6 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     ingredients = IngredientInRecipeSerializer(
         many=True,
         required=True,
-        source='recipe_ingredients'
     )
 
     class Meta:
@@ -153,6 +152,13 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
                 'Рецепт содержит дублирующиеся ингредиенты.'
             )
         return ingredients
+
+    def validate_tags(self, tags):
+        if len(tags) != len(set(tags)):
+            raise serializers.ValidationError(
+                'Рецепт не должен содержать повторяющиеся теги.'
+            )
+        return tags
 
     def validate_cooking_time(self, value):
         if value <= 0:
@@ -203,7 +209,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         ingredients_data = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
         instance.tags.set(tags_data)
-        instance.recipe_ingredients.clear()
+        instance.ingredients.clear()
         self.add_ingredients(instance, ingredients_data)
         return super().update(instance, validated_data)
 
