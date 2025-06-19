@@ -17,7 +17,7 @@ from api.serializers import (
     IngredientSerializer,
     RecipeCreateUpdateSerializer,
     RecipeMinifiedSerializer,
-    RecipeSerializer,
+    RecipeReadSerializer,
     SubscriptionUserSerializer,
     TagSerializer,
     UserSerializer
@@ -151,7 +151,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
             return RecipeCreateUpdateSerializer
-        return RecipeSerializer
+        return RecipeReadSerializer
 
     def get_queryset(self):
         user = self.request.user
