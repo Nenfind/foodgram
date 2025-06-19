@@ -225,7 +225,7 @@ class Favorite(ShopFavorite):
 class ShoppingCart(ShopFavorite):
     """Model for shopping cart."""
 
-    class Meta:
+    class Meta(ShopFavorite.Meta):
         verbose_name = 'корзина покупок'
         verbose_name_plural = 'корзины покупок'
         default_related_name = 'shopping_cart'

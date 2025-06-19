@@ -243,7 +243,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def download_shopping_cart(self, request):
         user = self.request.user
-        if not user.recipes_shoppingcart_related.exists():
+        if not user.shopping_cart.exists():
             return Response(status=status.HTTP_400_BAD_REQUEST)
         shopping_list = create_shopping_list(user)
         filename = f"{user.username}'s_shopping_list.txt"
