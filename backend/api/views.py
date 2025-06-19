@@ -210,13 +210,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=(permissions.IsAuthenticated,)
     )
     def favorite(self, request, pk=None):
-        self.favorite_shopping_cart_add(
+        return self.favorite_shopping_cart_add(
             request, Favorite, pk
         )
 
     @favorite.mapping.delete
     def favorite_delete(self, pk=None):
-        self.favorite_shopping_cart_delete(
+        return self.favorite_shopping_cart_delete(
             Favorite, pk
         )
 
@@ -226,13 +226,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=(permissions.IsAuthenticated,)
     )
     def shopping_cart(self, request, pk=None):
-        self.favorite_shopping_cart_add(
+        return self.favorite_shopping_cart_add(
             request, ShoppingCart, pk
         )
 
     @shopping_cart.mapping.delete
     def shopping_cart_delete(self, pk=None):
-        self.favorite_shopping_cart_delete(
+        return self.favorite_shopping_cart_delete(
             ShoppingCart, pk
         )
 
