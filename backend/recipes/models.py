@@ -6,7 +6,7 @@ from django.core.validators import (
     MinValueValidator
 )
 from django.db import models
-from django.db.models import Exists, OuterRef
+from django.db.models import BooleanField, Exists, OuterRef, Value
 
 from recipes.constants import (
     MAX_LENGTH_INGREDIENT,
@@ -104,8 +104,8 @@ class RecipeQuerySet(models.query.QuerySet):
                 )
             )
         return self.annotate(
-            is_favorited=False,
-            is_in_shopping_cart=False
+            is_favorited=Value(False, output_field=BooleanField()),
+            is_in_shopping_cart=Value(False, output_field=BooleanField())
         )
 
 
