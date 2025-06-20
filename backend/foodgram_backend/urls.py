@@ -15,7 +15,7 @@ if settings.DEBUG:
             settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
         ),
         path(
-            'api/redoc/',
+            'redoc/',
             TemplateView.as_view(template_name='redoc.html'),
             name='redoc'
         ),
