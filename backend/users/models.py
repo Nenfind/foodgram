@@ -14,11 +14,9 @@ class User(AbstractUser):
     email = models.EmailField(max_length=MAX_LENGTH_EMAIL, unique=True)
     first_name = models.CharField(
         max_length=MAX_LENGTH_NAME,
-        blank=False
     )
     last_name = models.CharField(
         max_length=MAX_LENGTH_NAME,
-        blank=False
     )
     avatar = models.ImageField(
         null=True,

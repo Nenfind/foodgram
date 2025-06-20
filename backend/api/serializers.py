@@ -3,7 +3,6 @@ from django.db import transaction
 from rest_framework import serializers
 
 from api.fields import Base64ImageField
-from recipes.constants import MAX_POSITIVE_SMALL_INT
 from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
 from users.models import Subscription
 
@@ -50,7 +49,7 @@ class AvatarForUserSerializer(serializers.ModelSerializer):
         fields = ('avatar',)
 
     def validate_avatar(self, value):
-        if value is None or len(value) == 0 or value == '':
+        if not value:
             raise serializers.ValidationError(
                 'Аватар не может быть пустым.'
             )
@@ -87,13 +86,6 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecipeIngredient
         fields = ('id', 'name', 'measurement_unit', 'amount')
-
-    def validate_amount(self, value):
-        if value <= 0:
-            raise serializers.ValidationError(
-                'Количество ингредиента должно быть положительным!'
-            )
-        return value
 
 
 class RecipeReadSerializer(serializers.ModelSerializer):
@@ -159,17 +151,6 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
                 'Рецепт не должен содержать повторяющиеся теги.'
             )
         return tags
-
-    def validate_cooking_time(self, value):
-        if value <= 0:
-            raise serializers.ValidationError(
-                'Время приготовления должно быть положительным!'
-            )
-        if value >= MAX_POSITIVE_SMALL_INT:
-            raise serializers.ValidationError(
-                'Слишком большое время приготовления.'
-            )
-        return value
 
     def validate(self, data):
         if not data.get('ingredients'):

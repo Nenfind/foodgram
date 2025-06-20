@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.db.models import Exists, OuterRef
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -22,8 +21,8 @@ from api.serializers import (
     TagSerializer,
     UserSerializer
 )
+from api.utils import create_shopping_list
 from recipes.models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
-from recipes.utils import create_shopping_list
 from users.models import Subscription
 
 User = get_user_model()
@@ -56,7 +55,7 @@ class UserViewSet(DjoserUserViewSet):
     @action(
         detail=False,
         methods=('put', 'delete',),
-        url_path=r'me/avatar'
+        url_path='me/avatar'
     )
     def avatar(self, request):
         if request.method == 'PUT':
@@ -154,22 +153,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return RecipeReadSerializer
 
     def get_queryset(self):
-        user = self.request.user
-        if not user.is_authenticated:
-            return Recipe.objects.all()
-        return Recipe.objects.annotate(
-            is_favorited=Exists(
-                Favorite.objects.filter(
-                    user=user,
-                    recipe=OuterRef('pk')
-                )
-            ),
-            is_in_shopping_cart=Exists(
-                ShoppingCart.objects.filter(
-                    user=user,
-                    recipe=OuterRef('pk')
-                )
-            )
+        return Recipe.objects.with_favorites_and_cart(
+            self.request.user
         ).select_related(
             'author'
         ).prefetch_related('tags', 'ingredients')

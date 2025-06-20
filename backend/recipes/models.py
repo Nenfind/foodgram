@@ -6,6 +6,7 @@ from django.core.validators import (
     MinValueValidator
 )
 from django.db import models
+from django.db.models import Exists, OuterRef
 
 from recipes.constants import (
     MAX_LENGTH_INGREDIENT,
@@ -79,9 +80,36 @@ class Tag(models.Model):
         return self.name[:MAX_LENGTH_STR]
 
 
+class RecipeQuerySet(models.query.QuerySet):
+    """
+    Helps by adding a method for fetching recipes with
+    annotated is_favorited and is_in_shopping_cart fields,
+    expects user as an argument.
+    """
+
+    def with_favorites_and_cart(self, user):
+        if user.is_authenticated:
+            return self.annotate(
+                is_favorited=Exists(
+                    Favorite.objects.filter(
+                        user=user,
+                        recipe=OuterRef('pk')
+                    )
+                ),
+                is_in_shopping_cart=Exists(
+                    ShoppingCart.objects.filter(
+                        user=user,
+                        recipe=OuterRef('pk')
+                    )
+                )
+            )
+        return self.all()
+
+
 class Recipe(models.Model):
     """Model for recipes, all fields are required."""
 
+    objects = RecipeQuerySet.as_manager()
     author = models.ForeignKey(
         User,
         verbose_name='автор рецепта',
