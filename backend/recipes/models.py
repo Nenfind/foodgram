@@ -88,19 +88,24 @@ class RecipeQuerySet(models.query.QuerySet):
     """
 
     def with_favorites_and_cart(self, user):
-        return self.annotate(
-            is_favorited=Exists(
-                Favorite.objects.filter(
-                    user=user,
-                    recipe=OuterRef('pk')
-                )
-            ),
-            is_in_shopping_cart=Exists(
-                ShoppingCart.objects.filter(
-                    user=user,
-                    recipe=OuterRef('pk')
+        if user.is_authenticated:
+            return self.annotate(
+                is_favorited=Exists(
+                    Favorite.objects.filter(
+                        user=user,
+                        recipe=OuterRef('pk')
+                    )
+                ),
+                is_in_shopping_cart=Exists(
+                    ShoppingCart.objects.filter(
+                        user=user,
+                        recipe=OuterRef('pk')
+                    )
                 )
             )
+        return self.annotate(
+            is_favorited=False,
+            is_in_shopping_cart=False
         )
 
 
